@@ -8,15 +8,15 @@ public class ConcurrentFIFO<T> {
     private static int DEFAULT_CAPACITY = 10;
     private static int CAPACITY_STEP = 10;
 
-    private T[] storage;
-    private int last;
+    private volatile T[] storage;
+    private volatile int last;
 
     public ConcurrentFIFO() {
         storage = (T[])new Object[DEFAULT_CAPACITY];
         last = -1;
     }
 
-    public boolean add(T item) {
+    public synchronized boolean add(T item) {
         if (last >= storage.length-1) {
             T[] newStorage = (T[])new Object[storage.length + CAPACITY_STEP];
             System.arraycopy(storage, 0, newStorage, 0, storage.length);
@@ -30,7 +30,7 @@ public class ConcurrentFIFO<T> {
         return true;
     }
 
-    public T poll() {
+    public synchronized T poll() {
         if (last == -1) {
             return null;
         }
