@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -53,17 +54,23 @@ public class ConcurrentFIFOTest {
     @Test(threadPoolSize = 10, invocationCount = 10, timeOut = 10000)
     public void multiThreadTest() throws Exception {
 
+        int[] itemsToAdd = null;
+
         synchronized (monitor1) {
             for (int i = 0; i < itemsByThreads.length; i++) {
                 if (itemsByThreads[i] != null) {
-                    for (int j = 0; j < itemsByThreads[i].length; j++) {
-                        concurrentFIFO.add(itemsByThreads[i][j]);
-                    }
+                    itemsToAdd = itemsByThreads[i];
                     itemsByThreads[i] = null;
                     itemsByThreads = itemsByThreads;
                     break;
                 }
             }
+        }
+
+        assertNotNull(itemsToAdd);
+
+        for (int i = 0; i < itemsToAdd.length; i++) {
+            concurrentFIFO.add(itemsToAdd[i]);
         }
 
         for (int i = 0; i < 10; i++) {
