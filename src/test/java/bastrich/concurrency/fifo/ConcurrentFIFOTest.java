@@ -1,6 +1,7 @@
-package bastrich;
+package bastrich.concurrency.fifo;
 
 
+import bastrich.concurrency.fifo.ConcurrentFIFO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;

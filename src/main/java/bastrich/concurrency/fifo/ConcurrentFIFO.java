@@ -1,4 +1,4 @@
-package bastrich;
+package bastrich.concurrency.fifo;
 
 /**
  * @author bastrich on 13.10.2017.
@@ -8,8 +8,8 @@ public class ConcurrentFIFO<T> {
     private static int DEFAULT_CAPACITY = 10;
     private static int CAPACITY_STEP = 10;
 
-    private volatile T[] storage;
-    private volatile int last;
+    private T[] storage;
+    private int last;
 
     public ConcurrentFIFO() {
         storage = (T[])new Object[DEFAULT_CAPACITY];
