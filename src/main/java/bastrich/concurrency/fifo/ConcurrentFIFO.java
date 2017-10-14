@@ -16,18 +16,21 @@ public class ConcurrentFIFO<T> {
         last = -1;
     }
 
-    public synchronized boolean add(T item) {
-        if (last >= storage.length-1) {
-            T[] newStorage = (T[])new Object[storage.length + CAPACITY_STEP];
-            System.arraycopy(storage, 0, newStorage, 0, storage.length);
-            newStorage[storage.length] = item;
-            last = storage.length;
-            storage = newStorage;
-        } else {
-            storage[last+1] = item;
-            last++;
+    public synchronized void add(T item) throws MaxQueueLengthException {
+        try {
+            if (last >= storage.length-1) {
+                T[] newStorage = (T[])new Object[storage.length + CAPACITY_STEP];
+                System.arraycopy(storage, 0, newStorage, 0, storage.length);
+                newStorage[storage.length] = item;
+                last = storage.length;
+                storage = newStorage;
+            } else {
+                storage[last+1] = item;
+                last++;
+            }
+        } catch (OutOfMemoryError e) {
+            throw new MaxQueueLengthException(e);
         }
-        return true;
     }
 
     public synchronized T poll() {
