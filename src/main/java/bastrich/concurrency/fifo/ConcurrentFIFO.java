@@ -5,47 +5,35 @@ package bastrich.concurrency.fifo;
  */
 public class ConcurrentFIFO<T> {
 
-    private static int DEFAULT_CAPACITY = 10;
-    private static int CAPACITY_STEP = 10;
-
     private T[] storage;
-    private int last;
+    private int lastAddedIndex;
+    private int lastPolledIndex;
 
-    public ConcurrentFIFO() {
-        storage = (T[])new Object[DEFAULT_CAPACITY];
-        last = -1;
+    public ConcurrentFIFO(int size) {
+        storage = (T[]) new Object[size];
+        lastAddedIndex = -1;
+        lastPolledIndex = -1;
     }
 
-    public synchronized void add(T item) throws MaxQueueLengthException {
-        try {
-            if (last >= storage.length-1) {
-                T[] newStorage = (T[])new Object[storage.length + CAPACITY_STEP];
-                System.arraycopy(storage, 0, newStorage, 0, storage.length);
-                newStorage[storage.length] = item;
-                last = storage.length;
-                storage = newStorage;
-            } else {
-                storage[last+1] = item;
-                last++;
-            }
-        } catch (OutOfMemoryError e) {
-            throw new MaxQueueLengthException(e);
+    public synchronized boolean add(T item) {
+        if (lastAddedIndex + 1 == lastPolledIndex
+                || lastAddedIndex == storage.length - 1 && lastPolledIndex == 0) {
+            return false;
         }
+
+        lastAddedIndex = lastAddedIndex == storage.length - 1 ? 0 : (lastAddedIndex + 1);
+        storage[lastAddedIndex] = item;
+        return true;
     }
 
     public synchronized T poll() {
-        if (last == -1) {
+        if (lastAddedIndex == lastPolledIndex) {
             return null;
         }
 
-        T result = storage[0];
+        lastPolledIndex = lastPolledIndex == storage.length - 1 ? 0 : (lastPolledIndex + 1);
 
-        for (int i = 1; i <= last; i++) {
-            storage[i-1] = storage[i];
-        }
-        last--;
-
-        return result;
+        return storage[lastPolledIndex];
     }
 
 }

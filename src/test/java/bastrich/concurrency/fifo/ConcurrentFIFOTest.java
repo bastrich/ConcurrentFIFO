@@ -26,7 +26,7 @@ public class ConcurrentFIFOTest {
 
     @BeforeTest
     public void init() {
-        concurrentFIFO = new ConcurrentFIFO<>();
+        concurrentFIFO = new ConcurrentFIFO<>(150);
         for (int i = 1; i <= 100; i++) {
             items.set(i-1, i);
         }
